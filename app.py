@@ -46,15 +46,21 @@ if choice == "บันทึกข้อมูล":
 
 elif choice == "เรียกดูข้อมูล":
     st.subheader("ฐานข้อมูลวัสดุทั้งหมด")
-    data = conn.read(worksheet="Sheet1")
+    data = conn.read(worksheet="Sheet1", ttl=0)
     
-    # เพิ่มฟิลเตอร์กรองตาม Project
-    project_filter = st.multiselect("เลือก Project", options=data["Project"].unique())
-    if project_filter:
-        data = data[data["Project"].isin(project_filter)]
-    
-    st.dataframe(data, use_container_width=True)
-    
-    # สรุปยอดรวมราคา
-    total_price = data["Price"].sum()
-    st.metric("ราคารวมทั้งหมด", f"{total_price:,.2f} บาท")
+    # 💡 ตรวจสอบก่อนว่ามีคอลัมน์ชื่อ 'Project' อยู่จริงไหม
+    if "Project" in data.columns:
+        # เพิ่มฟิลเตอร์กรองตาม Project
+        project_filter = st.multiselect("เลือก Project", options=data["Project"].unique())
+        if project_filter:
+            data = data[data["Project"].isin(project_filter)]
+        
+        st.dataframe(data, use_container_width=True)
+        
+        # สรุปยอดรวมราคา
+        if "Price" in data.columns:
+            total_price = pd.to_numeric(data["Price"]).sum()
+            st.metric("ราคารวมทั้งหมด", f"{total_price:,.2f} บาท")
+    else:
+        # หากระบบหาหัวคอลัมน์ไม่เจอ จะแสดงคำเตือนนี้แทนแถบสีแดงพังๆ
+        st.warning("⚠️ ไม่พบข้อมูลหรือหัวตารางใน Google Sheets กรุณาตรวจสอบว่ามีคอลัมน์ 'Project' และ 'Price' ในหน้า Sheet1 หรือยัง หรือลองบันทึกข้อมูลแรกเข้าไปก่อนครับ")
