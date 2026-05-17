@@ -5,6 +5,7 @@ from datetime import datetime
 
 # ตั้งค่าหน้าจอ
 st.set_page_config(page_title="Material Cost Tracker", layout="centered")
+st.title("AP Solution(1989) Co.,Ltd.")
 st.title("ระบบบันทึกฐานข้อมูลวัสดุ")
 
 # เชื่อมต่อ Google Sheets
